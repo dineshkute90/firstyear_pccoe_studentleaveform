@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Student Leave Management | PCCOE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Inter', system-ui, sans-serif;
+        }
+
+        body {
+            background: #f0f7ff;
+            padding: 2rem 1.5rem;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #1e3c72, #2b4c7c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .header p {
+            color: #2c5a7a;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            padding: 1.8rem 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.2s ease;
+            border: 1px solid #e2edff;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #2c7da0;
+            padding-left: 1rem;
+            color: #0f2b3d;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .student-entry {
+            background: #fefefe;
+            border: 1px solid #dce9f5;
+            border-radius: 24px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+            border-bottom: 1px dashed #cbdde9;
+            padding-bottom: 0.6rem;
+        }
+
+        .student-number {
+            font-weight: 700;
+            background: #e6f2f9;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1f5e8e;
+        }
+
+        .remove-btn {
+            background: #fff0f0;
+            border: none;
+            color: #b91c1c;
+            font-weight: 600;
+            padding: 0.3rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .remove-btn:hover {
+            background: #fcd9d9;
+        }
+
+        .prn-fetch-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            margin-bottom: 1.2rem;
+        }
+
+        .prn-input {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .prn-input label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #4a6a85;
+        }
+
+        .prn-input input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border-radius: 18px;
+            border: 1.5px solid #cddfed;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            background: white;
+        }
+
+        .prn-input input:focus {
+            border-color: #2c7da0;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
+        }
+
+        .fetch-btn {
+            background: #2c7da0;
+            border: none;
+            padding: 0.65rem 1.6rem;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fetch-btn:hover {
+            background: #1f5e7e;
+            transform: translateY(-1px);
+        }
+
+        .student-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-top: 1rem;
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 20px;
+        }
+
+        .info-item {
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: #3a6b8f;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: #0c4a6e;
+            word-break: break-word;
+            background: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 14px;
+            margin-top: 4px;
+        }
+
+        .leave-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #1f4662;
+            font-size: 0.85rem;
+        }
+
+        input, select, textarea {
+            padding: 0.7rem 1rem;
+            border-radius: 20px;
+            border: 1.5px solid #d4e2ef;
+            font-size: 0.9rem;
+            background: white;
+            transition: 0.2s;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .days-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .days-row .form-group {
+            flex: 1;
+        }
+
+        .btn-submit {
+            background: #1f7b4d;
+            color: white;
+            font-weight: 700;
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 1rem;
+            box-shadow: 0 5px 12px rgba(31,123,77,0.2);
+        }
+
+        .btn-submit:hover {
+            background: #0f5e3a;
+            transform: scale(0.99);
+        }
+
+        .btn-add {
+            background: #eef2ff;
+            border: 2px dashed #7c9ec0;
+            color: #1e5a7d;
+            font-weight: 600;
+            padding: 0.8rem 1.2rem;
+            border-radius: 60px;
+            width: 100%;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-add:hover {
+            background: #e1eaff;
+            border-color: #2c7da0;
+        }
+
+        .alert {
+            padding: 0.9rem 1.2rem;
+            border-radius: 28px;
+            margin-bottom: 1.2rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            color: #15803d;
+            border-left: 6px solid #15803d;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-left: 6px solid #b91c1c;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #6c8dae;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem;
+            }
+            .card {
+                padding: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📋 Student Leave Management</h1>
+        <p>First Year | Auto‑fetch from Google Sheet · Multi‑student support</p>
+    </div>
+
+    <div id="messageArea"></div>
+
+    <div class="card">
+        <div class="card-title">
+            <span>👥 Student Details</span>
+            <span style="font-size:0.8rem; font-weight:normal;">(PRN based fetch)</span>
+        </div>
+        <div id="studentsContainer"></div>
+        <button type="button" id="addStudentBtn" class="btn-add">+ Add another student</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📆 Leave Information</div>
+        <div class="leave-details">
+            <div class="form-group">
+                <label>📌 Type of Leave *</label>
+                <select id="leaveType">
+                    <option value="Personal Leave">Personal Leave</option>
+                    <option value="Event Attendance">Event Attendance</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>📅 From Date *</label>
+                <input type="date" id="fromDate">
+            </div>
+            <div class="form-group">
+                <label>📅 To Date *</label>
+                <input type="date" id="toDate">
+            </div>
+            <div class="form-group">
+                <label>📆 Total Leave Days (Working Days - Auto)</label>
+                <input type="text" id="autoDays" readonly style="background:#eef3fc;">
+            </div>
+            <div class="form-group">
+                <label>✏️ Manual Days (override if needed)</label>
+                <input type="number" id="manualDays" placeholder="Leave blank to use auto" step="1" min="0">
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>📝 Reason for Leave *</label>
+                <textarea rows="2" id="reason" placeholder="Explain reason for absence..."></textarea>
+            </div>
+        </div>
+        <button id="submitLeaveBtn" class="btn-submit">✅ Submit Leave Application</button>
+    </div>
+    <footer>🔐 Data syncs with Google Sheet via Apps Script • Leave records stored in separate sheet</footer>
+</div>
+
+<script>
+    // ========== 🔧 REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL ==========
+    const GAS_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL"; 
+    // Example: "https://script.google.com/macros/s/ABC123456789/exec"
+    // =========================================================================
+
+    let studentCounter = 1;
+    
+    function showMessage(text, type = "error") {
+        const msgDiv = document.getElementById("messageArea");
+        msgDiv.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+        setTimeout(() => {
+            if (msgDiv.firstChild) msgDiv.innerHTML = "";
+        }, 5000);
+    }
+
+    function getWorkingDays(startDateStr, endDateStr) {
+        if (!startDateStr || !endDateStr) return 0;
+        const start = new Date(startDateStr);
+        const end = new Date(endDateStr);
+        if (isNaN(start) || isNaN(end)) return 0;
+        if (start > end) return 0;
+        let count = 0;
+        let current = new Date(start);
+        while (current <= end) {
+            const day = current.getDay();
+            if (day !== 0 && day !== 6) count++;
+            current.setDate(current.getDate() + 1);
+        }
+        return count;
+    }
+
+    function updateAutoDays() {
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
+        if (fromDate && toDate) {
+            const working = getWorkingDays(fromDate, toDate);
+            document.getElementById("autoDays").value = working;
+        } else {
+            document.getElementById("autoDays").value = "";
+        }
+    }
+
+    document.getElementById("fromDate").addEventListener("change", updateAutoDays);
+    document.getElementById("toDate").addEventListener("change", updateAutoDays);
+
+    function getFinalTotalDays() {
+        const manual = document.getElementById("manualDays").value;
+        if (manual !== null && manual !== undefined && manual !== "") {
+            const manualNum = parseInt(manual, 10);
+            if (!isNaN(manualNum)) return manualNum;
+        }
+        const autoVal = document.getElementById("autoDays").value;
+        if (autoVal && !isNaN(autoVal)) return parseInt(autoVal, 10);
+        return 0;
+    }
+
+    function createStudentEntry(initialPrn = "") {
+        const entryId = `student_${Date.now()}_${studentCounter++}`;
+        const entryDiv = document.createElement("div");
+        entryDiv.className = "student-entry";
+        entryDiv.setAttribute("data-entry-id", entryId);
+
+        const headerDiv = document.createElement("div");
+        headerDiv.className = "student-header";
+        const studentIndexSpan = document.createElement("span");
+        studentIndexSpan.className = "student-number";
+        studentIndexSpan.innerText = `Student ${document.querySelectorAll(".student-entry").length + 1}`;
+        const removeBtn = document.createElement("button");
+        removeBtn.innerText = "Remove";
+        removeBtn.className = "remove-btn";
+        removeBtn.type = "button";
+        headerDiv.appendChild(studentIndexSpan);
+        headerDiv.appendChild(removeBtn);
+
+        const prnFetchDiv = document.createElement("div");
+        prnFetchDiv.className = "prn-fetch-group";
+        const prnInputDiv = document.createElement("div");
+        prnInputDiv.className = "prn-input";
+        const prnLabel = document.createElement("label");
+        prnLabel.innerText = "PRN Number *";
+        const prnInput = document.createElement("input");
+        prnInput.type = "text";
+        prnInput.placeholder = "e.g., 125B1F001";
+        prnInput.value = initialPrn;
+        prnInputDiv.appendChild(prnLabel);
+        prnInputDiv.appendChild(prnInput);
+
+        const fetchBtn = document.createElement("button");
+        fetchBtn.innerText = "🔍 Fetch Details";
+        fetchBtn.className = "fetch-btn";
+        prnFetchDiv.appendChild(prnInputDiv);
+        prnFetchDiv.appendChild(fetchBtn);
+
+        const detailsContainer = document.createElement("div");
+        detailsContainer.className = "student-details-grid";
+        detailsContainer.innerHTML = `<div class="info-item"><span class="info-label">Name</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Division</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Mobile Number</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Email ID</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Class Teacher</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Teacher Email</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Asso. Class Teacher</span><span class="info-value">—</span></div>
+                                      <div class="info-item"><span class="info-label">Asso. Teacher Mail</span><span class="info-value">—</span></div>`;
+
+        entryDiv.appendChild(headerDiv);
+        entryDiv.appendChild(prnFetchDiv);
+        entryDiv.appendChild(detailsContainer);
+
+        const entryState = {
+            prn: initialPrn,
+            fetchedData: null,
+            isValid: false
+        };
+
+        function updateDetailsUI(data) {
+            const items = detailsContainer.querySelectorAll(".info-item");
+            if (!data) {
+                items[0].querySelector(".info-value").innerText = "—";
+                items[1].querySelector(".info-value").innerText = "—";
+                items[2].querySelector(".info-value").innerText = "—";
+                items[3].querySelector(".info-value").innerText = "—";
+                items[4].querySelector(".info-value").innerText = "—";
+                items[5].querySelector(".info-value").innerText = "—";
+                items[6].querySelector(".info-value").innerText = "—";
+                items[7].querySelector(".info-value").innerText = "—";
+                return;
+            }
+            items[0].querySelector(".info-value").innerText = data.Name || "—";
+            items[1].querySelector(".info-value").innerText = data.Division || "—";
+            items[2].querySelector(".info-value").innerText = data["Mobile Number"] || "—";
+            items[3].querySelector(".info-value").innerText = data["Email ID"] || "—";
+            items[4].querySelector(".info-value").innerText = data["Class Teacher"] || "—";
+            items[5].querySelector(".info-value").innerText = data["Class Teacher Email ID"] || "—";
+            items[6].querySelector(".info-value").innerText = data["Asso. Class Teacher"] || "—";
+            items[7].querySelector(".info-value").innerText = data["Asso. Class Teacher Mail ID"] || "—";
+        }
+
+        async function fetchStudentDetails() {
+            const prnValue = prnInput.value.trim();
+            if (!prnValue) {
+                showMessage("Please enter PRN before fetching.", "error");
+                return;
+            }
+            fetchBtn.disabled = true;
+            fetchBtn.innerText = "⏳ Fetching...";
+            try {
+                const response = await fetch(`${GAS_URL}?prn=${encodeURIComponent(prnValue)}`);
+                const result = await response.json();
+                if (result.success && result.data) {
+                    entryState.fetchedData = result.data;
+                    entryState.prn = prnValue;
+                    entryState.isValid = true;
+                    updateDetailsUI(result.data);
+                    showMessage(`✅ Student ${result.data.Name || prnValue} loaded successfully.`, "success");
+                } else {
+                    entryState.isValid = false;
+                    entryState.fetchedData = null;
+                    updateDetailsUI(null);
+                    showMessage(`❌ PRN ${prnValue} not found in sheet.`, "error");
+                }
+            } catch (err) {
+                console.error(err);
+                entryState.isValid = false;
+                updateDetailsUI(null);
+                showMessage(`Network/API error: ${err.message}. Check GAS URL and CORS`, "error");
+            } finally {
+                fetchBtn.disabled = false;
+                fetchBtn.innerText = "🔍 Fetch Details";
+            }
+        }
+
+        fetchBtn.addEventListener("click", fetchStudentDetails);
+        if (initialPrn) {
+            prnInput.value = initialPrn;
+            setTimeout(() => fetchStudentDetails(), 200);
+        }
+
+        removeBtn.addEventListener("click", () => {
+            const currentEntries = document.querySelectorAll(".student-entry");
+            if (currentEntries.length === 1) {
+                showMessage("At least one student must remain. You can edit PRN instead.", "error");
+                return;
+            }
+            entryDiv.remove();
+            reindexStudentNumbers();
+        });
+
+        entryDiv.entryState = entryState;
+        return entryDiv;
+    }
+
+    function reindexStudentNumbers() {
+        const entries = document.querySelectorAll(".student-entry");
+        entries.forEach((entry, idx) => {
+            const headerSpan = entry.querySelector(".student-header .student-number");
+            if (headerSpan) headerSpan.innerText = `Student ${idx + 1}`;
+        });
+    }
+
+    function collectAllStudents() {
+        const entries = document.querySelectorAll(".student-entry");
+        const studentsList = [];
+        for (let entry of entries) {
+            const prnInput = entry.querySelector(".prn-input input");
+            const prn = prnInput ? prnInput.value.trim() : "";
+            const state = entry.entryState;
+            if (!state || !state.isValid || !state.fetchedData) {
+                showMessage(`⚠️ Student with PRN "${prn || '??'}" details not fetched / invalid. Please fetch details first.`, "error");
+                return null;
+            }
+            studentsList.push({
+                prn: state.prn,
+                studentData: state.fetchedData
+            });
+        }
+        return studentsList;
+    }
+
+    async function submitLeaveApplication() {
+        const students = collectAllStudents();
+        if (!students) return;
+
+        const leaveType = document.getElementById("leaveType").value;
+        const fromDate = document.getElementById("fromDate").value;
+        const toDate = document.getElementById("toDate").value;
+        const reason = document.getElementById("reason").value.trim();
+
+        if (!fromDate || !toDate) {
+            showMessage("Please select both From Date and To Date.", "error");
+            return;
+        }
+        if (new Date(fromDate) > new Date(toDate)) {
+            showMessage("From Date cannot be after To Date.", "error");
+            return;
+        }
+        if (!reason) {
+            showMessage("Please provide reason for leave.", "error");
+            return;
+        }
+
+        const totalDays = getFinalTotalDays();
+        if (totalDays <= 0) {
+            showMessage("Total leave days must be greater than 0 (auto or manual).", "error");
+            return;
+        }
+
+        const payload = {
+            students: students.map(s => s.prn),
+            leaveType: leaveType,
+            fromDate: fromDate,
+            toDate: toDate,
+            totalDays: totalDays,
+            reason: reason
+        };
+
+        const submitBtn = document.getElementById("submitLeaveBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerText = "⏳ Submitting...";
+
+        try {
+            const response = await fetch(GAS_URL, {
+                method: "POST",
+                mode: "cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (result.success) {
+                showMessage(`✅ Leave submitted for ${students.length} student(s). Sheet updated!`, "success");
+                document.getElementById("fromDate").value = "";
+                document.getElementById("toDate").value = "";
+                document.getElementById("reason").value = "";
+                document.getElementById("manualDays").value = "";
+                document.getElementById("autoDays").value = "";
+            } else {
+                showMessage(`❌ Submission failed: ${result.error || "Unknown error"}`, "error");
+            }
+        } catch (err) {
+            console.error(err);
+            showMessage(`Connection error: ${err.message}. Verify GAS URL and CORS`, "error");
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "✅ Submit Leave Application";
+        }
+    }
+
+    function initForm() {
+        const container = document.getElementById("studentsContainer");
+        container.innerHTML = "";
+        const firstEntry = createStudentEntry("");
+        container.appendChild(firstEntry);
+        document.getElementById("addStudentBtn").onclick = () => {
+            const newEntry = createStudentEntry("");
+            container.appendChild(newEntry);
+            reindexStudentNumbers();
+        };
+        document.getElementById("submitLeaveBtn").addEventListener("click", submitLeaveApplication);
+        
+        const today = new Date().toISOString().split('T')[0];
+        if (!document.getElementById("fromDate").value) document.getElementById("fromDate").value = today;
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 2);
+        if (!document.getElementById("toDate").value) document.getElementById("toDate").value = nextWeek.toISOString().split('T')[0];
+        updateAutoDays();
+    }
+
+    if (GAS_URL === "https://script.google.com/macros/s/AKfycbxQ57Tt_z64P1d0aoRUnaXVTyKkBGMN5SIXZMS8HbKRW28_jpqoNVCrEQz0F0cLyrYXrw/exec") {
+        showMessage("⚠️ Please configure your Google Apps Script URL in the GAS_URL variable (line ~130).", "error");
+    }
+    initForm();
+</script>
+</body>
+</html>
