@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Student Leave Management | PCCOE</title>
     <style>
+        /* All styles unchanged – keep the same as before */
         * {
             margin: 0;
             padding: 0;
@@ -370,8 +371,8 @@
 </div>
 
 <script>
-    // ⚠️ REPLACE THIS WITH YOUR ACTUAL WEB APP URL AFTER DEPLOYMENT
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxSrevQpVOe93Av8QTvmmwMRPYUiqrfoWg8biVSYA53jram2_WCnbbDZV2aSEDgDJUl/exec"; // <-- CHANGE THIS
+    // 👇 REPLACE THIS URL WITH YOUR ACTUAL APPS SCRIPT WEB APP URL
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwlVpHGi4dI1VkOxL206-aufdHR97yGCWrHsexKWa75650Qo1-KEdStyGCHTzjSi5uR/exec";
 
     let studentCounter = 1;
     
@@ -472,7 +473,6 @@
                                       <div class="info-item"><span class="info-label">Asso. Class Teacher</span><span class="info-value">—</span></div>
                                       <div class="info-item"><span class="info-label">Asso. Teacher Mail</span><span class="info-value">—</span></div>`;
 
-        // Leave history section
         const historyDiv = document.createElement("div");
         historyDiv.className = "leave-history";
         historyDiv.innerHTML = `<h4>📜 Leave History</h4>
@@ -512,9 +512,9 @@
                 return;
             }
             let tableHtml = `<table class="leave-table">
-                                <thead><tr>
-                                    <th>#</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th>
-                                </tr></thead><tbody>`;
+                                <thead>
+                                    <tr><th>#</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th></tr>
+                                </thead><tbody>`;
             history.forEach((leave, idx) => {
                 tableHtml += `<tr>
                                 <td>${idx+1}</td>
@@ -674,7 +674,7 @@
             const result = await response.json();
             if (result.success) {
                 showMessage(`✅ Leave submitted for ${students.length} student(s). Sheet updated!`, "success");
-                // Clear leave form (optional)
+                // Clear leave form
                 document.getElementById("fromDate").value = "";
                 document.getElementById("toDate").value = "";
                 document.getElementById("reason").value = "";
@@ -686,7 +686,6 @@
                     const prnInput = entry.querySelector(".prn-input input");
                     const prn = prnInput ? prnInput.value.trim() : "";
                     if (prn && entry.entryState && entry.entryState.isValid) {
-                        // Re-fetch to update history
                         const fetchBtn = entry.querySelector(".fetch-btn");
                         if (fetchBtn) fetchBtn.click();
                     }
@@ -723,9 +722,6 @@
         updateAutoDays();
     }
 
-    if (GAS_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") {
-        showMessage("⚠️ Please configure your Google Apps Script URL in the GAS_URL variable (line ~130).", "error");
-    }
     initForm();
 </script>
 </body>
