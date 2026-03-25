@@ -176,6 +176,36 @@
             border-radius: 14px;
             margin-top: 4px;
         }
+        .leave-history {
+            margin-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1rem;
+        }
+        .leave-history h4 {
+            font-size: 1rem;
+            color: #1f4662;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .leave-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+        .leave-table th, .leave-table td {
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .leave-table th {
+            background: #eef2ff;
+            color: #1f4662;
+        }
+        .leave-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
         .leave-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -279,6 +309,9 @@
             .card {
                 padding: 1.2rem;
             }
+            .leave-table {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -333,12 +366,12 @@
         </div>
         <button id="submitLeaveBtn" class="btn-submit">✅ Submit Leave Application</button>
     </div>
-    <footer>🔐 Data syncs with Google Sheet via Apps Script • Leave records stored in separate sheet</footer>
+    <footer>🔐 Data stored horizontally in student sheet (K–Z) • Up to 3 leaves per student</footer>
 </div>
 
 <script>
     // ⚠️ REPLACE THIS WITH YOUR ACTUAL WEB APP URL AFTER DEPLOYMENT
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzW3Y5z07mRyQOcoaikuL3KQwpUS-5A9G8n7-9uLk1v-ygtIj-f3soB2agP_tRgVPwn/exec"; // <-- CHANGE THIS
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzleAmgWZzjnqvOADeirdJKaFgCP1wm12YMPup6qEpnsdAw1k_yyurveHK87VlUsXeM/exec"; // <-- CHANGE THIS
 
     let studentCounter = 1;
     
@@ -439,9 +472,16 @@
                                       <div class="info-item"><span class="info-label">Asso. Class Teacher</span><span class="info-value">—</span></div>
                                       <div class="info-item"><span class="info-label">Asso. Teacher Mail</span><span class="info-value">—</span></div>`;
 
+        // Leave history section
+        const historyDiv = document.createElement("div");
+        historyDiv.className = "leave-history";
+        historyDiv.innerHTML = `<h4>📜 Leave History</h4>
+                                <div class="history-content">No leaves recorded yet.</div>`;
+
         entryDiv.appendChild(headerDiv);
         entryDiv.appendChild(prnFetchDiv);
         entryDiv.appendChild(detailsContainer);
+        entryDiv.appendChild(historyDiv);
 
         const entryState = {
             prn: initialPrn,
@@ -452,14 +492,7 @@
         function updateDetailsUI(data) {
             const items = detailsContainer.querySelectorAll(".info-item");
             if (!data) {
-                items[0].querySelector(".info-value").innerText = "—";
-                items[1].querySelector(".info-value").innerText = "—";
-                items[2].querySelector(".info-value").innerText = "—";
-                items[3].querySelector(".info-value").innerText = "—";
-                items[4].querySelector(".info-value").innerText = "—";
-                items[5].querySelector(".info-value").innerText = "—";
-                items[6].querySelector(".info-value").innerText = "—";
-                items[7].querySelector(".info-value").innerText = "—";
+                items.forEach(item => item.querySelector(".info-value").innerText = "—");
                 return;
             }
             items[0].querySelector(".info-value").innerText = data.Name || "—";
@@ -470,6 +503,40 @@
             items[5].querySelector(".info-value").innerText = data["Class Teacher Email ID"] || "—";
             items[6].querySelector(".info-value").innerText = data["Asso. Class Teacher"] || "—";
             items[7].querySelector(".info-value").innerText = data["Asso. Class Teacher Mail ID"] || "—";
+        }
+
+        function renderLeaveHistory(history) {
+            const contentDiv = historyDiv.querySelector(".history-content");
+            if (!history || history.length === 0) {
+                contentDiv.innerHTML = "No leaves recorded yet.";
+                return;
+            }
+            let tableHtml = `<table class="leave-table">
+                                <thead><tr>
+                                    <th>#</th><th>Leave Type</th><th>From</th><th>To</th><th>Days</th><th>Reason</th>
+                                </tr></thead><tbody>`;
+            history.forEach((leave, idx) => {
+                tableHtml += `<tr>
+                                <td>${idx+1}</td>
+                                <td>${escapeHtml(leave.type)}</td>
+                                <td>${escapeHtml(leave.from)}</td>
+                                <td>${escapeHtml(leave.to)}</td>
+                                <td>${escapeHtml(leave.days)}</td>
+                                <td>${escapeHtml(leave.reason)}</td>
+                              </tr>`;
+            });
+            tableHtml += `</tbody></table>`;
+            contentDiv.innerHTML = tableHtml;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
         }
 
         async function fetchStudentDetails() {
@@ -488,17 +555,20 @@
                     entryState.prn = prnValue;
                     entryState.isValid = true;
                     updateDetailsUI(result.data);
+                    renderLeaveHistory(result.leaveHistory || []);
                     showMessage(`✅ Student ${result.data.Name || prnValue} loaded successfully.`, "success");
                 } else {
                     entryState.isValid = false;
                     entryState.fetchedData = null;
                     updateDetailsUI(null);
+                    renderLeaveHistory([]);
                     showMessage(`❌ PRN ${prnValue} not found in sheet.`, "error");
                 }
             } catch (err) {
                 console.error(err);
                 entryState.isValid = false;
                 updateDetailsUI(null);
+                renderLeaveHistory([]);
                 showMessage(`Network/API error: ${err.message}. Check GAS URL and CORS`, "error");
             } finally {
                 fetchBtn.disabled = false;
@@ -604,11 +674,23 @@
             const result = await response.json();
             if (result.success) {
                 showMessage(`✅ Leave submitted for ${students.length} student(s). Sheet updated!`, "success");
+                // Clear leave form (optional)
                 document.getElementById("fromDate").value = "";
                 document.getElementById("toDate").value = "";
                 document.getElementById("reason").value = "";
                 document.getElementById("manualDays").value = "";
                 document.getElementById("autoDays").value = "";
+                // Refresh history for all students
+                const entries = document.querySelectorAll(".student-entry");
+                for (let entry of entries) {
+                    const prnInput = entry.querySelector(".prn-input input");
+                    const prn = prnInput ? prnInput.value.trim() : "";
+                    if (prn && entry.entryState && entry.entryState.isValid) {
+                        // Re-fetch to update history
+                        const fetchBtn = entry.querySelector(".fetch-btn");
+                        if (fetchBtn) fetchBtn.click();
+                    }
+                }
             } else {
                 showMessage(`❌ Submission failed: ${result.error || "Unknown error"}`, "error");
             }
